@@ -297,9 +297,9 @@ func GetPlatformArchFromWorkflowConfig(workflowConfig *manager.WorkflowConfig, n
 
 // BuildJobParame takes a parameter called 'params' which is comma separated list of
 // KEY=VALUE pairs obtained from the user's command in the clusterbot app. KEY/VALUE
-// pairs can look like "KEY=VALUE" or "KEY=KEY1=VALUE1\nKEY2=VALUE2" where a newline
-// character is used to separate the KEY/VALUE pairs when a user passes in a KEY whose
-// value is a list of KEY/VALUE pairs. This function returns a map of KEY/VALUE pairs
+// pairs can look like "KEY=VALUE" or "DEVSCRIPTS_CONFIG=KEY1=VALUE1\nKEY2=VALUE2" where
+// a newline character is used to separate the KEY/VALUE pairs when a user passes in a
+// DEVSCRIPTS_CONFIG parameter. This function returns a map of KEY/VALUE pairs
 func BuildJobParams(params string) (map[string]string, error) {
 	var splitParams []string
 	if len(params) > 0 {
@@ -315,11 +315,15 @@ func BuildJobParams(params string) (map[string]string, error) {
 	}
 	jobParams := make(map[string]string)
 	for _, combinedParam := range splitParams {
-		// Check for newlines used to delimit nested paramenters in in the KEY/VALUE pair
-		if strings.Contains(combinedParam, "\\n") {
+		// Check for DEVSCRIPTS_CONFIG ; if found, we know we're dealing with newline separated nested parameters.
+		if strings.Contains(combinedParam, "DEVSCRIPTS_CONFIG") {
 			// Split by the equal, treat the first part as the key, treat the rest as the value
 			parts := strings.SplitN(combinedParam, "=", 2)
 			if len(parts) == 2 {
+				if strings.Contains(parts[1], ",") {
+					// DEVSCRIPTS_CONFIG needs to be delimited by newlines.
+					return nil, fmt.Errorf("unable to interpret `%s` as a DEVSCRIPTS_CONFIG parameter. Please ensure that nested parameters are delimited by newlines", combinedParam)
+				}
 				jobParams[parts[0]] = parts[1]
 				continue
 			} else {
