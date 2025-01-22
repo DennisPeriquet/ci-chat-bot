@@ -35,13 +35,31 @@ func TestBuildJobParams(t *testing.T) {
 			name:        "IncorrectlyDeliminatedParameter",
 			params:      "\"KEY1:VALUE1\"",
 			expected:    nil,
-			errorString: "unable to interpret `KEY1:VALUE1` as a parameter. Please ensure that all parameters are in the form of KEY=VALUE",
+			errorString: "unable to interpret `KEY1:VALUE1` as a parameter. Please ensure that all parameters are in the form of KEY=VALUE; nested parameters should be delimited with \\n",
 		},
 		{
 			name:        "MarkDownLinkParameter",
 			params:      "\"KEY1=<http://abc123.com|VALUE1>\"",
 			expected:    map[string]string{"KEY1": "VALUE1"},
 			errorString: "",
+		},
+		{
+			name:        "One NestedParameter", // Nested parmeters require a new line (even if there's only one)
+			params:      "\"KEY=\\nKEY1=VALUE1\"",
+			expected:    map[string]string{"KEY": "\\nKEY1=VALUE1"},
+			errorString: "",
+		},
+		{
+			name:        "Two NestedParameters",
+			params:      "\"KEY=KEY1=VALUE1\\nKEY2=VALUE2\"",
+			expected:    map[string]string{"KEY": "KEY1=VALUE1\\nKEY2=VALUE2"},
+			errorString: "",
+		},
+		{
+			name:        "NestedParametersBad",
+			params:      "\"KEY=KEY1=VALUE1,KEY2=VALUE2\"",
+			expected:    nil,
+			errorString: "unable to interpret `KEY=KEY1=VALUE1,KEY2=VALUE2` as a parameter. Please ensure that all parameters are in the form of KEY=VALUE; nested parameters should be delimited with \\n",
 		},
 	}
 	for _, tc := range testCases {

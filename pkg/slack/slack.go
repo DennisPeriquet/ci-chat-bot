@@ -295,6 +295,11 @@ func GetPlatformArchFromWorkflowConfig(workflowConfig *manager.WorkflowConfig, n
 	return platform, architecture, nil
 }
 
+// BuildJobParame takes a parameter called 'params' which is comma separated list of
+// KEY=VALUE pairs obtained from the user's command in the clusterbot app. KEY/VALUE
+// pairs can look like "KEY=VALUE" or "KEY=KEY1=VALUE1\nKEY2=VALUE2" where a newline
+// character is used to separate the KEY/VALUE pairs when a user passes in a KEY whose
+// value is a list of KEY/VALUE pairs. This function returns a map of KEY/VALUE pairs
 func BuildJobParams(params string) (map[string]string, error) {
 	var splitParams []string
 	if len(params) > 0 {
@@ -310,9 +315,20 @@ func BuildJobParams(params string) (map[string]string, error) {
 	}
 	jobParams := make(map[string]string)
 	for _, combinedParam := range splitParams {
+		// Check for newlines used to delimit nested paramenters in in the KEY/VALUE pair
+		if strings.Contains(combinedParam, "\\n") {
+			// Split by the equal, treat the first part as the key, treat the rest as the value
+			parts := strings.SplitN(combinedParam, "=", 2)
+			if len(parts) == 2 {
+				jobParams[parts[0]] = parts[1]
+				continue
+			} else {
+				return nil, fmt.Errorf("unable to interpret nested parameters in `%s`. Please ensure that nested parameters are in the form of KEY=KEY1=VALUE1\nKEY2=VALUE2", combinedParam)
+			}
+		}
 		split := strings.Split(combinedParam, "=")
 		if len(split) != 2 {
-			return nil, fmt.Errorf("unable to interpret `%s` as a parameter. Please ensure that all parameters are in the form of KEY=VALUE", combinedParam)
+			return nil, fmt.Errorf("unable to interpret `%s` as a parameter. Please ensure that all parameters are in the form of KEY=VALUE; nested parameters should be delimited with \\n", combinedParam)
 		}
 		jobParams[split[0]] = parseParameterValue(split[1])
 	}
