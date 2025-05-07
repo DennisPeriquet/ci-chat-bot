@@ -654,7 +654,7 @@ github.com/gogo/protobuf/sortkeys
 # github.com/golang-jwt/jwt v3.2.2+incompatible
 ## explicit
 github.com/golang-jwt/jwt
-# github.com/golang-jwt/jwt/v4 v4.5.0
+# github.com/golang-jwt/jwt/v4 v4.5.2
 ## explicit; go 1.16
 github.com/golang-jwt/jwt/v4
 # github.com/golang-migrate/migrate/v4 v4.16.1
@@ -974,7 +974,7 @@ github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v1.1.14
 ## explicit; go 1.18
 github.com/opencontainers/runc/libcontainer/user
-# github.com/openshift-online/ocm-common v0.0.16
+# github.com/openshift-online/ocm-common v0.0.21
 ## explicit; go 1.21
 github.com/openshift-online/ocm-common/pkg/aws/consts
 github.com/openshift-online/ocm-common/pkg/aws/errors
@@ -1132,8 +1132,8 @@ github.com/openshift/library-go/pkg/oauth/oauthdiscovery
 github.com/openshift/oc/pkg/helpers/term
 github.com/openshift/oc/pkg/helpers/tokencmd
 github.com/openshift/oc/pkg/version
-# github.com/openshift/rosa v1.2.51
-## explicit; go 1.21
+# github.com/openshift/rosa v1.2.53
+## explicit; go 1.23
 github.com/openshift/rosa/assets
 github.com/openshift/rosa/pkg/arguments
 github.com/openshift/rosa/pkg/aws
